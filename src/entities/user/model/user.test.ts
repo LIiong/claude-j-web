@@ -9,9 +9,9 @@ describe('User entity', () => {
   });
 
   it('should_throw_when_email_invalid', () => {
-    expect(() =>
-      User.create({ id: 'u1', email: 'not-an-email', status: 'PENDING' }),
-    ).toThrow(/Invalid email/);
+    expect(() => User.create({ id: 'u1', email: 'not-an-email', status: 'PENDING' })).toThrow(
+      /Invalid email/,
+    );
   });
 
   it('should_activate_when_status_is_pending', () => {
