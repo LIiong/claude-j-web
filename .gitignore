@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Build
+dist/
+build/
+
+# Test
+coverage/
+playwright-report/
+test-results/
+
+# Generated OpenAPI client
+src/shared/api/generated/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# Env
+.env.local
+.env.*.local
+
+# Claude Code
+.claude-current-role
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
