@@ -1,7 +1,7 @@
 /**
  * dependency-cruiser 配置 —— FSD 依赖规则（L2 架构守护）
  *
- * 规则组织方式参考 ArchUnit 在 claude-j 的 14 条模式。
+ * 规则组织方式参考 Feature-Sliced Design 依赖方向与 slice 边界。
  */
 module.exports = {
   forbidden: [

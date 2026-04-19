@@ -46,7 +46,7 @@ allowed-tools: "Read Glob Grep Bash(ls *)"
 
 | Task ID | 阶段 | 状态 | From → To | Pre-flight |
 |---------|------|------|-----------|------------|
-| 005-user-management | Build 进行中 | coding-in-progress | dev → qa | mvn:pass checkstyle:pass entropy:pass |
+| 005-user-profile | Build 进行中 | coding-in-progress | dev → qa | tsc:pass vitest:pass biome:pass entropy:pass |
 
 ## 已归档任务
 

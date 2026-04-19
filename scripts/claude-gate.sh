@@ -4,16 +4,23 @@
 # 返回值: 0=允许编辑, 1=阻止编辑
 #
 
-# 只检查 Java 源文件的修改
+# 只检查前端业务源文件的修改（TS/TSX），放行测试与生成文件
 FILE_PATH="${1:-}"
 
 if [[ -z "$FILE_PATH" ]]; then
     exit 0  # 没有文件路径，放行
 fi
 
-# 只拦截 src/main/java 下的文件创建/修改
-if [[ ! "$FILE_PATH" =~ src/main/java/.*\.java$ ]]; then
-    exit 0  # 不是业务代码文件，放行
+# 只拦截 src/ 下的 *.ts / *.tsx 业务源码
+if [[ ! "$FILE_PATH" =~ ^(.*/)?src/.*\.(ts|tsx)$ ]]; then
+    exit 0
+fi
+# 放行：测试文件、生成文件、类型声明
+if [[ "$FILE_PATH" =~ \.(test|spec)\.(ts|tsx)$ ]] \
+   || [[ "$FILE_PATH" =~ /shared/api/generated/ ]] \
+   || [[ "$FILE_PATH" =~ \.d\.ts$ ]] \
+   || [[ "$FILE_PATH" =~ /tests/ ]]; then
+    exit 0
 fi
 
 # 检查是否有活跃的执行计划

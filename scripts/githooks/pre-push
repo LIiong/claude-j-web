@@ -1,6 +1,6 @@
 #!/bin/bash
 # =================================================================
-# Pre-push Hook — Full test suite + entropy check before push
+# Pre-push Hook — Full test suite + architecture + entropy check before push
 # Install: git config core.hooksPath scripts/githooks
 # Skip (emergency only): git push --no-verify
 # =================================================================
@@ -12,8 +12,8 @@ echo "  Pre-push: Full verification"
 echo "============================================"
 echo ""
 
-echo "=== [1/3] Running all tests (including ArchUnit) ==="
-mvn test -B -q 2>/dev/null
+echo "=== [1/4] Running all unit/component tests (Vitest) ==="
+pnpm vitest run
 if [ $? -ne 0 ]; then
     echo "FAIL: Tests failed. Please fix before pushing."
     exit 1
@@ -21,16 +21,25 @@ fi
 echo "PASS: All tests passed."
 echo ""
 
-echo "=== [2/3] Checkstyle check ==="
-mvn checkstyle:check -B -q 2>/dev/null
+echo "=== [2/4] Biome check ==="
+pnpm biome check src tests
 if [ $? -ne 0 ]; then
-    echo "FAIL: Checkstyle violations found. Please fix before pushing."
+    echo "FAIL: Biome violations found. Please fix before pushing."
     exit 1
 fi
-echo "PASS: Checkstyle passed."
+echo "PASS: Biome passed."
 echo ""
 
-echo "=== [3/3] Entropy check ==="
+echo "=== [3/4] Architecture check (dependency-cruiser) ==="
+pnpm exec depcruise src
+if [ $? -ne 0 ]; then
+    echo "FAIL: FSD architecture violations found. Please fix before pushing."
+    exit 1
+fi
+echo "PASS: Architecture clean."
+echo ""
+
+echo "=== [4/4] Entropy check ==="
 ./scripts/entropy-check.sh
 if [ $? -ne 0 ]; then
     echo "FAIL: Entropy check failed. Please fix before pushing."

@@ -54,47 +54,47 @@
 ## 领域分析
 
 ### 聚合根: {AggregateName}
-<!-- 列出聚合根的核心属性和值对象 -->
+<!-- entities/{aggregate}/model 下，纯 TS。列出核心属性与值对象 -->
 - field1 (ValueObject1) — 说明
 - field2 (ValueObject2) — 说明
 
 ### 值对象
-<!-- 每个值对象单独列出，说明约束条件 -->
+<!-- 每个值对象单独列出，说明约束条件（不可变、`readonly` + 工厂方法 + Object.freeze） -->
 - **{ValueObject1}**: 约束说明，不可变
 - **{ValueObject2}**: 约束说明，不可变
 
-### 领域服务（如有）
-<!-- 无法归属到单一聚合的业务逻辑 -->
+### 领域方法 / 状态机（如有）
+<!-- 聚合上可触发的命名方法（返回新实例），状态转换图 -->
 
-### 端口接口
-<!-- Repository 和其他需要 infrastructure 实现的接口 -->
-- **{Aggregate}Repository**: 方法列表
-- **{DomainService}**: 方法列表
+### 端口接口（TypeScript 类型）
+<!-- Repository 类型 / 由 shared/api 实现的契约 -->
+- **{Aggregate}Repository**: 方法列表（TS 签名）
+- **外部服务类型**: 方法列表
 
 ## 关键算法/技术方案
-<!-- 核心算法设计、技术选型理由、性能考量 -->
+<!-- 状态管理选型（Zustand vs TanStack Query）、数据流、缓存策略、性能考量 -->
 
 
-## API 设计
+## API 设计（对接后端 claude-j OpenAPI）
 
-| 方法 | 路径 | 描述 | 请求体 | 响应体 |
-|------|------|------|--------|--------|
-| POST | /api/v1/xxx | 创建 | `{ "field": "value" }` | `{ "success": true, "data": {...} }` |
-| GET | /api/v1/xxx/{id} | 查询 | — | `{ "success": true, "data": {...} }` |
+| 方法 | 路径 | 描述 | 请求体 | 响应体（ApiResult<T> 包装） |
+|------|------|------|--------|-----------------------------|
+| POST | /api/v1/xxx | 创建 | `{ "field": "value" }` | `{ "success": true, "data": {...}, "errorCode": "", "message": "" }` |
+| GET  | /api/v1/xxx/{id} | 查询 | — | 同上 |
 
-## 数据库设计（如有）
-<!-- DDL、索引策略、数据量预估 -->
-```sql
-CREATE TABLE IF NOT EXISTS t_xxx (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    -- 字段定义
-);
-```
+### DTO（Zod schema）
+定义在 `src/shared/api/dto/{aggregate}.ts`，用 Zod 校验响应并推导 TS 类型。
+
+### 错误码
+<!-- 列出后端会返回的业务错误码 + 前端处理策略（toast / 字段错误 / 跳转） -->
+- `AUTH_001` → 跳登录
+- `VALIDATION_001` → 字段错误展示
+- 其它 → 全局 toast
 
 ## 影响范围
-<!-- 按 DDD 分层列出新增/修改的类 -->
-- **domain**:
-- **application**:
-- **infrastructure**:
-- **adapter**:
-- **start**:
+<!-- 按 FSD 分层列出新增/修改的文件 -->
+- **entities/{aggregate}**: {聚合、值对象、mapper}
+- **shared/api**: {DTO schema、fetch 封装}
+- **features/{slice}**: {ui / model / api / index.ts}
+- **widgets**（如需）：{页面级组合}
+- **app/{route}**: {page.tsx 装配}

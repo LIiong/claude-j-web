@@ -7,14 +7,19 @@ timestamp: "{YYYY-MM-DDTHH:MM:SS}"
 task-type: frontend              # backend-only | frontend | full-stack
 ui-surface: true                 # 是否产出可见 UI；false 时整套 UI 流程自动跳过
 ui-review-score: pending         # Verify 阶段由 @qa 填写（如 4.2/5）；ui-surface=false 写 N/A
+backend-sync:
+  schema-sha: pending            # api-sync.sh 产出的 sha256 前 12 位；任务无后端调用则 N/A
+  sync-mode: pending             # real | mock | n/a —— Spec/Build 阶段决定；Verify 必须切 real 重验
+  backend-probe: pending         # reachable | unreachable | n/a —— backend-probe.sh 结果，60 秒内有效
 pre-flight:
-  mvn-test: pending            # 填真实输出，如: pass # Tests run: 50, Failures: 0
-  checkstyle: pending           # 填真实输出，如: pass # Exit 0
-  entropy-check: pending        # 填真实输出，如: pass # 12/12 checks passed
-  tdd-evidence:                 # 🔴 强制：每个生产类都要有红绿两个 commit hash
+  tsc: pending                 # 填真实输出，如: pass # pnpm tsc --noEmit exit 0
+  vitest: pending              # 填真实输出，如: pass # Tests: 50 passed, 0 failed
+  biome: pending               # 填真实输出，如: pass # checked 47 files, no fixes needed
+  entropy-check: pending       # 填真实输出，如: pass # 13/13 checks passed
+  tdd-evidence:                # 🔴 强制：每个生产类/关键模块都要有红绿两个 commit hash
     - class: "{ClassName}"
-      red-commit: "{hash7}"     # test(xxx): add failing test (Red)
-      green-commit: "{hash7}"   # feat(xxx): implement to pass (Green)
+      red-commit: "{hash7}"    # test(xxx): add failing test (Red)
+      green-commit: "{hash7}"  # feat(xxx): implement to pass (Green)
 artifacts:
   - requirement-design.md
   - task-plan.md
@@ -46,7 +51,7 @@ summary: ""
 
 ### {日期} — @dev → @qa
 - 状态：pending-review
-- Pre-flight：mvn-test: pass | checkstyle: pass | entropy-check: pass
+- Pre-flight：tsc: pass | vitest: pass | biome: pass | entropy-check: pass
 - 说明：{验收请求}
 
 ### {日期} — @qa → (Ship)

@@ -205,10 +205,10 @@ else
 - 最后更新：${TIMESTAMP}
 
 ## 任务清单
-- [ ] 1. 独立重跑三项预飞检查（mvn test + checkstyle + entropy-check）
+- [ ] 1. 独立重跑四项预飞检查（tsc + vitest + biome + entropy-check）
 - [ ] 2. 编写测试用例设计（test-case-design.md）
-- [ ] 3. 编写集成测试（start 模块）
-- [ ] 4. 代码审查（聚合设计、值对象、转换链、异常处理）
+- [ ] 3. 编写 E2E / 关键路径测试（Playwright + MSW）
+- [ ] 4. 代码审查（FSD 分层、值对象、转换链、错误处理、a11y）
 - [ ] 5. 编写测试报告（test-report.md）
 - [ ] 6. 更新 handoff.md（approved 或 changes-requested）
 

@@ -17,7 +17,7 @@ if [ -z "$LATEST_TASK" ]; then
 fi
 
 # 检查本次提交是否包含业务代码
-if git diff --cached --name-only | grep -q "src/main/java/.*\.java$"; then
+if git diff --cached --name-only | grep -E "^src/.*\.(ts|tsx)$" | grep -Ev "\.(test|spec)\.(ts|tsx)$|^src/shared/api/generated/" | grep -q .; then
     # 包含业务代码，检查需求设计文档
     REQ_DOC="$ACTIVE_DIR/$LATEST_TASK/requirement-design.md"
     if [ ! -f "$REQ_DOC" ]; then

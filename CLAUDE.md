@@ -124,5 +124,12 @@ Ralph（编排主 Agent）
 
 ## 后端对接
 - OpenAPI schema 来源：`http://localhost:8080/v3/api-docs`（claude-j 后端）
-- 生成命令：`pnpm run generate:api`（见 `package.json` scripts）
-- 生成产物：`src/shared/api/generated/`（禁止手改）
+- 生成命令：`pnpm run generate:api`（底层）；agent 用 `./scripts/api-sync.sh`（探测 + 拉取 + sha 追踪一步到位）
+- 生成产物：`src/shared/api/generated/`（`schema.d.ts` 禁止手改；`.schema.sha256` / `.schema.meta.json` 由脚本维护）
+- **联调门**（机械触发）：
+  - @dev **Spec** 阶段需求涉及 `/api/**` 时必须跑 `api-sync.sh`，并把 `backend-sync.{schema-sha, sync-mode, backend-probe}` 填入 `handoff.md`
+  - @dev **Build** 阶段收尾用 `./scripts/backend-probe.sh` 探测；后端可达须额外跑一遍不带 `USE_MOCK` 的 `pnpm vitest run`
+  - @qa **Verify** 阶段后端必须可达（不可达 → 阻断验收），且必须跑 `./scripts/api-sync.sh --check-drift` 检测 Spec 后漂移
+- **离线降级**：后端不可达时 `export USE_MOCK=1 && pnpm vitest run` 启用 MSW handlers；每个 slice 在 `src/features/<slice>/api/__msw__/handlers.ts` 声明自己的 handler
+- **PreToolUse Hook**：`guard-api-sync.sh` 拦截 `src/features/*/api/**` 和 `src/shared/api/client.ts` 的写入，`.schema.sha256` 缺失或 >7 天未更新会阻断
+- 详见 `docs/architecture/backend-integration.md`

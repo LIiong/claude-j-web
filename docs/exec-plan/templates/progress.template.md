@@ -13,17 +13,17 @@
 > 使用 checkbox 格式。完成后标记 [x] 并附 commit hash。
 > ralph-loop.sh 通过读取第一个 [ ] 项确定下一个任务。
 
-- [x] 1. Domain：定义聚合根（示例，commit abc1234）
-- [ ] 2. Domain：定义值对象 ← 当前
-- [ ] 3. Domain：定义 Repository 端口
-- [ ] 4. Application：创建命令 + DTO
-- [ ] 5. Application：创建应用服务
-- [ ] 6. Infrastructure：创建 DO + Mapper
-- [ ] 7. Infrastructure：实现 Repository
-- [ ] 8. Adapter：创建 Controller + Request/Response
-- [ ] 9. Start：DDL + 配置
-- [ ] 10. 各层编写测试
-- [ ] 11. 验证：mvn test + checkstyle + entropy-check
+- [x] 1. entities：定义聚合根（示例，commit abc1234）
+- [ ] 2. entities：定义值对象 ← 当前
+- [ ] 3. shared/api：Zod DTO + fetch 封装
+- [ ] 4. features/{slice}/model：store / hook / mapper
+- [ ] 5. features/{slice}/api：mutation / query + MSW 测试
+- [ ] 6. features/{slice}/ui：组件 + RTL 测试
+- [ ] 7. widgets（如需）：页面级组合
+- [ ] 8. app/{route}/page.tsx：装配
+- [ ] 9. 各层测试补齐
+- [ ] 10. 验证：tsc + vitest + biome + entropy-check
+- [ ] 11. （ui-surface=true）UI-SPEC.md + ui-verification-report.md
 
 ## 迭代日志
 

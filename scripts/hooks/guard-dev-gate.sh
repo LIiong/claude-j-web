@@ -1,7 +1,7 @@
 #!/bin/bash
 # =================================================================
 # guard-dev-gate.sh — PreToolUse Hook: 开发准入守护
-# 在写入 src/main/java 前检查是否有已批准的执行计划
+# 在写入业务源码（src/**/*.{ts,tsx}，不含测试与生成文件）前检查是否有已批准的执行计划
 # 无活跃任务或任务状态不允许时 exit 2 阻断
 # =================================================================
 
@@ -20,8 +20,15 @@ except:
     print('')
 " 2>/dev/null)
 
-# 非 Java 源文件放行
-if [[ "$FILE_PATH" != */src/main/java/*.java ]]; then
+# 仅对业务源码（src/**/*.ts, src/**/*.tsx）启用 Gate
+# 放行：非 src/、测试文件（*.test.ts / *.spec.ts / tests/）、生成文件（shared/api/generated/）、类型声明（*.d.ts）
+if [[ "$FILE_PATH" != */src/*.ts && "$FILE_PATH" != */src/*.tsx ]]; then
+    exit 0
+fi
+if [[ "$FILE_PATH" == *.test.ts || "$FILE_PATH" == *.test.tsx || "$FILE_PATH" == *.spec.ts || "$FILE_PATH" == *.spec.tsx ]]; then
+    exit 0
+fi
+if [[ "$FILE_PATH" == *"/tests/"* || "$FILE_PATH" == *"/shared/api/generated/"* || "$FILE_PATH" == *.d.ts ]]; then
     exit 0
 fi
 

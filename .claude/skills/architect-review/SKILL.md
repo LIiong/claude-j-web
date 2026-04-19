@@ -19,9 +19,10 @@ allowed-tools: "Read Write Edit Glob Grep Bash(./scripts/entropy-check.sh) Bash(
 ## 参考文档（必须阅读）
 - `docs/architecture/overview.md` — 架构概览
 - `docs/architecture/decisions/` — 已有 ADR
-- `docs/standards/java-dev.md` — 开发规范
-- `CLAUDE.md` — 聚合列表与架构约束
-- 已有聚合代码（如 shortlink、coupon）— 确保新设计与既有模式一致
+- `.claude/rules/ts-dev.md` / `.claude/rules/ts-test.md` — 开发 + 测试规范
+- `.claude/rules/architecture.md` — FSD 依赖方向
+- `CLAUDE.md` — 聚合（slice）列表与架构约束
+- 已有 slice 代码 — 确保新设计与既有模式一致
 
 ## 执行步骤
 
@@ -35,10 +36,10 @@ echo "architect" > .claude-current-role
 - 确认 `handoff.md` 状态合法：`to: architect, status: pending-review`
 
 ### 2. 交叉验证
-- 对照 `docs/architecture/overview.md` 验证六边形架构合规
+- 对照 `docs/architecture/overview.md` 验证 FSD 分层合规
 - 检查 `docs/architecture/decisions/` 下 ADR 是否有冲突决策
-- 检查 CLAUDE.md 聚合列表，确认无循环依赖 / 命名冲突
-- 对比已实现聚合的代码模式（包结构、命名、Lombok、转换链）
+- 检查 CLAUDE.md 聚合（slice）列表，确认无跨 slice 直接 import / 命名冲突
+- 对比已实现 slice 的代码模式（目录结构、命名导出、转换链 DTO↔Entity↔UI Model）
 
 ### 3. 运行架构基线检查
 ```bash
@@ -46,37 +47,37 @@ echo "architect" > .claude-current-role
 ```
 确认当前基线无 FAIL 级违规。
 
-### 4. 评审检查项（9 项清单）
+### 4. 评审检查项
 
-**聚合设计**：
-- [ ] 聚合根边界合理（一事务一聚合）
-- [ ] 聚合根封装所有业务不变量（非贫血模型）
-- [ ] 状态变更仅通过聚合根方法（无公开 setter）
+**Entity / 聚合设计**：
+- [ ] 聚合边界合理（一场景一聚合）
+- [ ] Entity 封装所有业务不变量（非贫血模型）
+- [ ] 状态变更仅通过命名方法（无 public setter）
 
 **值对象识别**：
 - [ ] 金额、标识符、状态等应识别为值对象
-- [ ] 值对象不可变（`final` 字段、`equals/hashCode`）
-- [ ] 构造函数中完成约束校验
+- [ ] 值对象不可变（`readonly` 字段 + 工厂方法）
+- [ ] 构造 / 工厂中完成约束校验
 
-**端口设计**：
-- [ ] Repository 端口定义在 `domain` 层
-- [ ] 方法粒度合适（不多不少）
-- [ ] 返回 Domain，不返回 DO
+**shared/api 契约设计**：
+- [ ] DTO 用 Zod schema 声明并只出现在 shared/api
+- [ ] mapper（DTO ↔ Entity）归属明确，单向依赖
+- [ ] 与后端 OpenAPI 契约一致（或生成产物已同步）
 
-**依赖方向**：
-- [ ] `adapter → application → domain ← infrastructure`
-- [ ] 与已有聚合无循环依赖
-- [ ] 对象转换链完整（Request/Response ↔ DTO ↔ Domain ↔ DO）
+**依赖方向**（FSD）：
+- [ ] `app → widgets → features → entities ← shared`
+- [ ] 与已有 slice 无跨 slice 直接 import
+- [ ] 转换链完整（API Response ↔ DTO (Zod) ↔ Entity ↔ UI Model）
 
-**DDL 设计**：
-- [ ] 表名 `t_{entity}`，列名 snake_case
-- [ ] 索引策略合理
-- [ ] 字段与领域模型一致
+**状态管理**：
+- [ ] 领域状态归 Entity 方法 / Zustand store（不在 UI 组件内）
+- [ ] 服务端状态走 TanStack Query（缓存键设计合理）
+- [ ] entities 层无 react/next/zustand/@tanstack/* 依赖
 
-**API 设计**：
-- [ ] RESTful 规范（`/api/v1/{resource}`）
-- [ ] 响应统一 `ApiResult<T>`
-- [ ] 错误码使用 `BusinessException + ErrorCode`
+**API 契约 / UI 契约**：
+- [ ] Next.js route 设计符合 App Router 约定（server/client 边界清晰）
+- [ ] 错误呈现策略统一（typed Error + code 字段）
+- [ ] 若 ui-surface=true：UI-SPEC.md 存在且被 handoff.artifacts 列出
 
 **ADR 需求**：
 - [ ] 是否有需要记录的重大架构决策
@@ -136,7 +137,7 @@ git commit -m "docs(review): $ARGUMENTS 架构评审 {通过|打回}"
 - `docs/architecture/decisions/` 下的 ADR 文件
 
 **禁写**：
-- 任何 `*.java`
+- 任何 `*.ts` / `*.tsx`
 - `task-plan.md`、`dev-log.md`（@dev 职责）
 - `test-case-design.md`、`test-report.md`（@qa 职责）
 
