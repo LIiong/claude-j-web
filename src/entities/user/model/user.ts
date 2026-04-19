@@ -1,55 +1,107 @@
+import type { Email } from './email';
+import type { UserId } from './userId';
+
 /**
- * User entity —— 示例聚合根。
- * 封装业务不变量：状态机（PENDING → ACTIVE → SUSPENDED）。
- * 纯 TS：禁止 import react/next/zustand 等框架。
+ * User status enum
  */
+export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 
-export type UserStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED';
-
+/**
+ * Properties required to create a User
+ */
 export interface UserProps {
-  readonly id: string;
-  readonly email: string;
+  readonly id: UserId;
+  readonly email: Email;
+  readonly nickname: string;
   readonly status: UserStatus;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 }
 
+/**
+ * User aggregate root - immutable entity with business invariants
+ */
 export class User {
-  private constructor(private readonly props: UserProps) {}
+  readonly id: UserId;
+  readonly email: Email;
+  readonly nickname: string;
+  readonly status: UserStatus;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+
+  private constructor(props: UserProps) {
+    this.id = props.id;
+    this.email = props.email;
+    this.nickname = props.nickname;
+    this.status = props.status;
+    this.createdAt = props.createdAt;
+    this.updatedAt = props.updatedAt;
+
+    Object.freeze(this);
+  }
 
   static create(props: UserProps): User {
     if (!props.id) {
       throw new Error('User.id is required');
     }
-    if (!props.email.includes('@')) {
-      throw new Error(`Invalid email: ${props.email}`);
+    if (!props.email) {
+      throw new Error('User.email is required');
+    }
+    if (!props.nickname || props.nickname.trim() === '') {
+      throw new Error('User.nickname is required');
+    }
+    if (!props.status) {
+      throw new Error('User.status is required');
+    }
+    if (!props.createdAt || !props.updatedAt) {
+      throw new Error('User.createdAt and updatedAt are required');
     }
     return new User(props);
   }
 
-  get id(): string {
-    return this.props.id;
+  /**
+   * Factory method for reconstructing from persistence
+   */
+  static reconstruct(props: UserProps): User {
+    return new User(props);
   }
 
-  get email(): string {
-    return this.props.email;
+  /**
+   * Check if user is in ACTIVE status
+   */
+  isActive(): boolean {
+    return this.status === 'ACTIVE';
   }
 
-  get status(): UserStatus {
-    return this.props.status;
-  }
-
-  /** 激活用户：仅 PENDING → ACTIVE 合法。 */
-  activate(): User {
-    if (this.props.status !== 'PENDING') {
-      throw new Error(`Cannot activate user in status ${this.props.status}`);
+  /**
+   * Return new User with updated nickname (immutable)
+   */
+  updateNickname(nickname: string): User {
+    if (!nickname || nickname.trim() === '') {
+      throw new Error('Nickname cannot be empty');
     }
-    return new User({ ...this.props, status: 'ACTIVE' });
+    return new User({
+      ...this,
+      nickname: nickname.trim(),
+      updatedAt: new Date(),
+    });
   }
 
-  /** 暂停用户：仅 ACTIVE → SUSPENDED 合法。 */
-  suspend(): User {
-    if (this.props.status !== 'ACTIVE') {
-      throw new Error(`Cannot suspend user in status ${this.props.status}`);
-    }
-    return new User({ ...this.props, status: 'SUSPENDED' });
+  /**
+   * Return new User with updated status (immutable)
+   */
+  updateStatus(status: UserStatus): User {
+    return new User({
+      ...this,
+      status,
+      updatedAt: new Date(),
+    });
+  }
+
+  /**
+   * Check equality based on id
+   */
+  equals(other: User): boolean {
+    return this.id.equals(other.id);
   }
 }
