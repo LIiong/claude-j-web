@@ -1,13 +1,6 @@
-/**
- * Shared HTTP client — 所有后端调用的唯一出口。
- *
- * 真实项目里这里会：
- *   1. 从 generated/schema.d.ts 拿到 paths 类型；
- *   2. 用 openapi-fetch 创建类型安全的 client；
- *   3. 注入 auth token、错误映射、retry 策略。
- *
- * 当前为占位版本（待 OpenAPI schema 生成后替换）。
- */
+import { config } from '@/shared/config';
+
+const BASE_URL = config.apiBaseUrl;
 
 // Token storage key
 const ACCESS_TOKEN_KEY = 'claude_j_access_token';
@@ -78,7 +71,7 @@ export async function apiFetch<T>(path: string, options: FetchOptions = {}): Pro
     }
   }
 
-  const res = await fetch(path, {
+  const res = await fetch(`${BASE_URL}${path}`, {
     method: options.method ?? 'GET',
     headers,
     body: options.body ? JSON.stringify(options.body) : undefined,

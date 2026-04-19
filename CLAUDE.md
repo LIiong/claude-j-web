@@ -47,7 +47,7 @@ app → widgets → features → entities ← shared
 <!-- 随业务开发逐步填入 -->
 | 层 | Slice | 说明 |
 |----|-------|------|
-| — | — | 新项目，尚无业务 slice |
+| entities | user | 用户聚合（User实体 + Email/AccessToken/UserId/UserStatus值对象）|
 
 ## 关键约定
 - 路径别名：`@/*` → `src/*`

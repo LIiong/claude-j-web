@@ -96,7 +96,16 @@ memory: project
 - [ ] **外科性**：设计仅改动任务直接相关的文件；若涉及跨聚合大改，在评审意见说明理由
 - [ ] **假设显性**：需求里含糊的字段/边界/异常，requirement-design 已在「假设与待确认」列出
 
+**UI 合规（6 项 — 仅当 handoff.ui-surface=true 启用；false 时整节标 N/A）**
+- [ ] **UI-SPEC 存在**：`{task-dir}/UI-SPEC.md` 存在且被 `handoff.artifacts` 列出（`ls` 校验）
+- [ ] **交互流可映射到测试**：UI-SPEC §4 每条交互流都在 `test-case-design.md` 有对应自动化测试方法（手动项需写明替代自动化方案）
+- [ ] **组件来源可控**：新 tsx 文件只 import `@/shared/ui/*` 或明确在 requirement-design 声明新增的 shadcn 组件；禁止裸 `<button>` / `<input>`（`grep` 校验）
+- [ ] **无硬编码样式**：新 tsx 无 `#[0-9a-f]{3,6}` 颜色字面值、无 `\d+px` 内联尺寸（正则校验）；全走 Tailwind 语义 token
+- [ ] **响应式覆盖**：UI-SPEC §7 列出 ≥3 断点（mobile/tablet/desktop）且 §3 对每断点有线框/布局说明
+- [ ] **A11y 四项**：UI-SPEC §8 逐条勾选（label / keyboard / contrast / 三态）
+
 > 完整原则与反模式：`.claude/rules/karpathy-guidelines.md`
+> UI 规范细则：`docs/standards/ui-guidelines.md`
 
 ### 评审意见
 {具体意见、建议、问题}

@@ -1,62 +1,47 @@
-import type { User } from '@/entities/user';
-import type { AccessToken } from '@/entities/user';
+import { clearTokens, setTokens } from '@/shared/api/client';
+import type { TokenDataDTO } from '@/shared/api/dto/auth';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-/**
- * Auth state interface
- */
-export interface AuthState {
-  /** Current authenticated user */
-  user: User | null;
-  /** Current access token */
-  accessToken: AccessToken | null;
-  /** Whether user is authenticated */
-  isAuthenticated: boolean;
-
-  /** Login action - set user and token */
-  login: (user: User, token: AccessToken) => void;
-  /** Logout action - clear all auth data */
-  logout: () => void;
-  /** Update user data */
-  setUser: (user: User) => void;
+/** 登录成功后保存的会话信息（纯 JSON，可安全序列化） */
+export interface SessionUser {
+  readonly userId: string;
+  readonly username: string;
+  readonly email: string | null;
+  readonly phone: string | null;
 }
 
-/**
- * Auth store with persistence
- * Only persist user data (not token for security, use localStorage directly in client)
- */
+export interface AuthState {
+  session: SessionUser | null;
+  isAuthenticated: boolean;
+  login: (data: TokenDataDTO) => void;
+  logout: () => void;
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: null,
-      accessToken: null,
+      session: null,
       isAuthenticated: false,
 
-      login: (user, token) =>
+      login: (data) => {
+        setTokens(data.accessToken, data.refreshToken);
         set({
-          user,
-          accessToken: token,
+          session: {
+            userId: data.userId,
+            username: data.username,
+            email: data.email,
+            phone: data.phone,
+          },
           isAuthenticated: true,
-        }),
+        });
+      },
 
-      logout: () =>
-        set({
-          user: null,
-          accessToken: null,
-          isAuthenticated: false,
-        }),
-
-      setUser: (user) => set({ user }),
+      logout: () => {
+        clearTokens();
+        set({ session: null, isAuthenticated: false });
+      },
     }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-        // Note: accessToken is NOT persisted in zustand store,
-        // we use localStorage directly for token management
-      }),
-    },
+    { name: 'auth-storage' },
   ),
 );

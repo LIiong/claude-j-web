@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { UserId } from './userId';
 
 describe('UserId', () => {
-  it('should_create_userId_when_valid_uuid', () => {
+  it('should_create_userid_when_valid_uuid', () => {
     const validUuid = '550e8400-e29b-41d4-a716-446655440000';
     const userId = UserId.create(validUuid);
     expect(userId.value).toBe(validUuid);
@@ -16,7 +16,7 @@ describe('UserId', () => {
     expect(() => UserId.create('')).toThrow('Invalid UUID format');
   });
 
-  it('should_generate_new_unique_userId', () => {
+  it('should_generate_unique_userid_when_generate_called', () => {
     const userId1 = UserId.generate();
     const userId2 = UserId.generate();
     expect(userId1.value).not.toBe(userId2.value);

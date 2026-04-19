@@ -54,7 +54,7 @@ describe('User', () => {
     expect(user.isActive()).toBe(false);
   });
 
-  it('should_update_nickname_returning_new_user', () => {
+  it('should_return_new_user_with_updated_nickname_when_update_nickname_called', () => {
     const user = User.create({
       id: UserId.create('550e8400-e29b-41d4-a716-446655440000'),
       email: Email.create('user@example.com'),
@@ -68,7 +68,7 @@ describe('User', () => {
     expect(user.nickname).toBe('OldName'); // original unchanged
   });
 
-  it('should_be_immutable_after_creation', () => {
+  it('should_be_frozen_when_created', () => {
     const user = User.create({
       id: UserId.create('550e8400-e29b-41d4-a716-446655440000'),
       email: Email.create('user@example.com'),

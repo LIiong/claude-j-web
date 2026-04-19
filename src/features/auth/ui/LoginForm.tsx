@@ -11,27 +11,24 @@ export interface LoginFormProps {
 export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
   const form = useForm<LoginCredentialsDTO>({
     resolver: zodResolver(LoginCredentialsSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { account: '', password: '', rememberMe: false },
   });
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1">
-          邮箱
+        <label htmlFor="account" className="block text-sm font-medium mb-1">
+          账号（邮箱或手机号）
         </label>
         <input
-          {...form.register('email')}
-          type="email"
-          id="email"
-          placeholder="请输入邮箱"
+          {...form.register('account')}
+          type="text"
+          id="account"
+          placeholder="请输入邮箱或手机号"
           className="w-full px-3 py-2 border rounded-md"
         />
-        {form.formState.errors.email && (
-          <p className="text-red-500 text-sm mt-1">{form.formState.errors.email.message}</p>
+        {form.formState.errors.account && (
+          <p className="text-red-500 text-sm mt-1">{form.formState.errors.account.message}</p>
         )}
       </div>
 
@@ -49,6 +46,13 @@ export function LoginForm({ onSubmit, isLoading, error }: LoginFormProps) {
         {form.formState.errors.password && (
           <p className="text-red-500 text-sm mt-1">{form.formState.errors.password.message}</p>
         )}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input {...form.register('rememberMe')} type="checkbox" id="rememberMe" />
+        <label htmlFor="rememberMe" className="text-sm">
+          记住我
+        </label>
       </div>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}

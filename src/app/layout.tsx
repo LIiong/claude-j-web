@@ -1,7 +1,5 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-
-const queryClient = new QueryClient();
+import { Providers } from './providers';
 
 export const metadata = {
   title: 'claude-j-web',
@@ -12,7 +10,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN">
       <body>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

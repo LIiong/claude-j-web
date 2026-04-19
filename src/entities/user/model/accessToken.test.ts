@@ -39,13 +39,13 @@ describe('AccessToken', () => {
     expect(token.isValid()).toBe(false);
   });
 
-  it('should_default_tokenType_to_Bearer', () => {
+  it('should_use_bearer_type_when_tokentype_not_specified', () => {
     const futureDate = new Date(Date.now() + 3600 * 1000);
     const token = AccessToken.create('jwt-token', futureDate);
     expect(token.tokenType).toBe('Bearer');
   });
 
-  it('should_get_authorization_header', () => {
+  it('should_return_bearer_token_when_get_authorization_header_called', () => {
     const futureDate = new Date(Date.now() + 3600 * 1000);
     const token = AccessToken.create('jwt-token', futureDate, 'Bearer');
     expect(token.getAuthorizationHeader()).toBe('Bearer jwt-token');

@@ -1,26 +1,20 @@
-import { apiFetch, clearTokens } from '@/shared/api/client';
+import { apiFetch } from '@/shared/api/client';
 import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '../model/store';
 
-/**
- * Logout mutation hook
- */
 export function useLogout() {
-  const logout = useAuthStore((state) => state.logout);
+  const { logout, session } = useAuthStore();
 
   return useMutation<void, Error, void>({
     mutationFn: async () => {
-      await apiFetch('/api/v1/auth/logout', {
-        method: 'POST',
-      });
+      if (session?.userId) {
+        await apiFetch('/api/v1/auth/logout', {
+          method: 'POST',
+          body: { userId: session.userId },
+        }).catch(() => {});
+      }
     },
-    onSuccess: () => {
-      clearTokens();
-      logout();
-    },
-    onError: () => {
-      // Even if server logout fails, clear local state
-      clearTokens();
+    onSettled: () => {
       logout();
     },
   });

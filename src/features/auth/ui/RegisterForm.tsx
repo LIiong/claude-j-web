@@ -1,29 +1,40 @@
-import { type RegisterDTO, RegisterSchema } from '@/shared/api/dto/auth';
+import { type RegisterFormDTO, RegisterFormSchema } from '@/shared/api/dto/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 export interface RegisterFormProps {
-  onSubmit: (data: RegisterDTO) => void;
+  onSubmit: (data: RegisterFormDTO) => void;
   isLoading?: boolean;
   error?: string | null;
 }
 
 export function RegisterForm({ onSubmit, isLoading, error }: RegisterFormProps) {
-  const form = useForm<RegisterDTO>({
-    resolver: zodResolver(RegisterSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      nickname: '',
-    },
+  const form = useForm<RegisterFormDTO>({
+    resolver: zodResolver(RegisterFormSchema),
+    defaultValues: { username: '', email: '', password: '', confirmPassword: '' },
   });
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md">
       <div>
+        <label htmlFor="username" className="block text-sm font-medium mb-1">
+          用户名
+        </label>
+        <input
+          {...form.register('username')}
+          type="text"
+          id="username"
+          placeholder="请输入用户名（2-20位）"
+          className="w-full px-3 py-2 border rounded-md"
+        />
+        {form.formState.errors.username && (
+          <p className="text-red-500 text-sm mt-1">{form.formState.errors.username.message}</p>
+        )}
+      </div>
+
+      <div>
         <label htmlFor="email" className="block text-sm font-medium mb-1">
-          邮箱
+          邮箱（可选）
         </label>
         <input
           {...form.register('email')}
@@ -38,22 +49,6 @@ export function RegisterForm({ onSubmit, isLoading, error }: RegisterFormProps) 
       </div>
 
       <div>
-        <label htmlFor="nickname" className="block text-sm font-medium mb-1">
-          昵称
-        </label>
-        <input
-          {...form.register('nickname')}
-          type="text"
-          id="nickname"
-          placeholder="请输入昵称"
-          className="w-full px-3 py-2 border rounded-md"
-        />
-        {form.formState.errors.nickname && (
-          <p className="text-red-500 text-sm mt-1">{form.formState.errors.nickname.message}</p>
-        )}
-      </div>
-
-      <div>
         <label htmlFor="password" className="block text-sm font-medium mb-1">
           密码
         </label>
@@ -61,7 +56,7 @@ export function RegisterForm({ onSubmit, isLoading, error }: RegisterFormProps) 
           {...form.register('password')}
           type="password"
           id="password"
-          placeholder="请输入密码（8-32位）"
+          placeholder="8位以上，含大小写字母和数字"
           className="w-full px-3 py-2 border rounded-md"
         />
         {form.formState.errors.password && (

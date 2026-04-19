@@ -39,11 +39,29 @@ memory: project
 ### 4. 按模板填写设计文档
 按 `requirement-design.md` 模板填写各节：
 - 需求描述
+- UI 原型（**仅当 handoff.ui-surface=true**；见步骤 4.1）
 - 领域分析（聚合根、值对象、端口接口）
 - 关键算法/技术方案
 - API 设计
 - 数据库设计
 - 影响范围
+
+### 4.1 UI 原型设计（仅当 handoff.ui-surface=true）
+在写 API 设计之前：
+
+1. **调用 `gsd:ui-phase` skill** 产出 `{task-dir}/UI-SPEC.md`（完整原型、交互、组件清单、响应式、a11y）
+   - 若 skill 不适用或需快速产原型，按 `docs/exec-plan/templates/ui-spec.template.md` 手工填写
+2. **摘要嵌入 requirement-design.md 的「UI 原型」章节**：
+   - 页面/视图表
+   - 主流程 + 异常分支（2-3 条）
+   - 组件来源（shared/ui 复用 / 本次新增 shadcn 组件）
+   - 设计令牌引用（禁止硬编码颜色/间距）
+   - 响应式断点（mobile/tablet/desktop）
+   - a11y 四项（label / keyboard / contrast / 三态）
+3. **在 handoff.artifacts 列出 `UI-SPEC.md`**
+4. **参考规范**：`docs/standards/ui-guidelines.md`
+
+若 `ui-surface=false`（后端-only 任务），在 requirement-design 的「UI 原型」章节只写 `N/A (backend-only)`，不产 UI-SPEC.md。
 
 ### 5. 按模板填写任务执行计划
 按 `task-plan.md` 模板填写：

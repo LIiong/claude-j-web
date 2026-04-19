@@ -56,6 +56,27 @@ memory: project
 - 编写集成测试（start 模块，全链路穿透 H2）
 - 验证功能正确性
 
+### 4.1 UI 验收（仅当 handoff.ui-surface=true — 强制；false 则跳过）
+
+**强制流程**（任一步省略 → `status: changes-requested` 打回）：
+
+1. **起本地服务**：`pnpm dev`
+2. **启动 Preview MCP**：`mcp__Claude_Preview__preview_start`
+3. **每关键页面 × 3 断点截图**：
+   - `mcp__Claude_Preview__preview_resize`（375 / 768 / 1440）
+   - `mcp__Claude_Preview__preview_screenshot` → 存 `{task-dir}/screenshots/{route-slug}-{bp}.png`
+4. **每交互流驱动**：
+   - `preview_click` / `preview_fill` 逐步走主流程 + 异常分支
+   - 终态 `preview_screenshot`
+   - `mcp__Claude_Preview__preview_console_logs` 断言**无 error 级日志**
+5. **GIF 录制主交互流**：`mcp__Claude_in_Chrome__gif_creator` → 存 `{task-dir}/flows/{flow}.gif`
+6. **强制跑 `gsd:ui-review` skill**：对每个关键页面做 6 维评分（视觉层级 / 一致性 / 可读性 / 交互反馈 / 响应式 / a11y）
+   - 填入 `handoff.md` 的 `ui-review-score` 字段（如 `4.2/5`）
+   - **任一维度 <3/5 → `status: changes-requested`**，打回 @dev 修复
+7. **产出 `{task-dir}/ui-verification-report.md`**（按 `docs/exec-plan/templates/ui-verification-report.template.md`），含截图链接、GIF 链接、6 维评分表、问题清单
+
+若 `ui-surface=false`：跳过本节，在 `handoff.ui-review-score` 填 `N/A`，test-report.md 相关章节省略。
+
 ### 5. 代码 Review
 ArchUnit 已自动覆盖依赖方向和 domain 纯净性，以下为需人工审查的项：
 - [ ] 聚合根封装业务不变量（非贫血模型）

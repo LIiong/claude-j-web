@@ -4,6 +4,9 @@ from: dev
 to: architect
 status: pending-review
 timestamp: "{YYYY-MM-DDTHH:MM:SS}"
+task-type: frontend              # backend-only | frontend | full-stack
+ui-surface: true                 # 是否产出可见 UI；false 时整套 UI 流程自动跳过
+ui-review-score: pending         # Verify 阶段由 @qa 填写（如 4.2/5）；ui-surface=false 写 N/A
 pre-flight:
   mvn-test: pending            # 填真实输出，如: pass # Tests run: 50, Failures: 0
   checkstyle: pending           # 填真实输出，如: pass # Exit 0
