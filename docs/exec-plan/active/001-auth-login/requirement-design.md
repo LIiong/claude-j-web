@@ -205,3 +205,52 @@ entities/
 - **shared/api/**: 新增 `dto/auth.ts` DTO schemas、`client.ts` 鉴权拦截器增强
 - **app/**: 新增 `/login`、`/register` 路由页面
 - **widgets/**: 暂无（后续可添加 Header 组件显示用户信息）
+
+---
+
+## 架构评审
+
+**评审人**: @architect
+**日期**: 2026-04-19
+**结论**: 通过
+
+### 评审检查项（9 维）
+
+**架构合规（5 项）**
+- [x] 聚合边界清晰: User 作为聚合根封装 id/email/nickname/status，值对象识别充分
+- [x] 值对象不可变: Email/AccessToken/UserId 均设计为 readonly + 工厂方法创建
+- [x] 依赖方向正确: entities → shared/api DTO → features model/store → features ui → app，符合 FSD 自上而下
+- [x] 端口定义合理: AuthApiClient 位于 shared/api/，login/register/refresh 方法粒度适中
+- [x] 状态管理方案合适: TanStack Query 管服务器状态 + Zustand 管客户端状态 + persist 持久化，分层清晰
+
+**API/测试（2 项）**
+- [x] API 契约完整: 覆盖 login/register/refresh/logout，Zod schema 定义完备，含密码一致性校验 refine
+- [x] 测试策略覆盖: entities 层纯 Vitest 测不变量，features 层 Vitest+MSW 测 mutation，UI 层 RTL 测交互，符合分层测试策略
+
+**设计质量（2 项）**
+- [x] 无过度设计: 无单一实现的 Strategy/Factory，领域服务明确说明"无需额外"
+- [x] 符合 Karpathy 简洁原则: 任务计划按 entities→shared→features→app 分层拆解，每项 10-15 分钟，验证命令+预期输出明确
+
+### 评审意见
+
+设计整体合规，符合 FSD 架构要求：
+
+1. **entities/ 纯净性**: User 实体仅依赖 TypeScript 原生，无 React/Next 依赖，符合纯净要求
+2. **转换链完整**: API Response → Zod DTO → Entity → UI Model 的转换路径清晰，LoginCredentialsSchema/RegisterSchema/AuthResponseSchema 定义在 shared/api/
+3. **状态分层合理**: 服务器状态(TanStack Query)与客户端状态(Zustand)分离，Token 存储策略已在「待确认事项」显式声明
+4. **任务粒度合规**: 16 项任务按层拆解，每个原子任务含文件路径+验证命令+预期输出+commit 消息，符合模板要求
+
+**待确认事项**（已在 handoff.md 列出，开发时关注）：
+- 后端 `/api/v1/auth` 接口字段格式需对接真实 OpenAPI schema
+- Token 存储策略 localStorage vs HttpOnly cookie 需最终确认
+
+**基线检查**: entropy-check.sh 13/13 项通过
+
+### 通过条件
+
+- [x] 架构合规检查: PASS
+- [x] 熵扫描基线: PASS (13/13)
+- [x] 任务计划粒度: 合格 (10-15分钟/步，含验证命令)
+- [x] 无循环依赖风险: 确认 (新聚合仅依赖 shared/api，无反向依赖)
+
+**评审结论**: 设计通过，可以进入 Build 阶段。
