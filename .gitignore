@@ -18,7 +18,14 @@ playwright-report/
 test-results/
 
 # Generated OpenAPI client
-src/shared/api/generated/
+src/shared/api/generated/*
+# 保留契约追踪产物（agent 通过 sha256 检测漂移；meta 记录同步时间 / 后端 git SHA）
+!src/shared/api/generated/.schema.sha256
+!src/shared/api/generated/.schema.meta.json
+!src/shared/api/generated/.gitkeep
+
+# Claude Code — api-sync 会话级标记
+.claude/.api-sync-session
 
 # OS
 .DS_Store

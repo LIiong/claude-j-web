@@ -46,7 +46,7 @@ alwaysApply: false
 - 禁止使用"应该"、"可能"、"看起来"等不确定词汇在上述文档中做正向声称
 - 禁止照搬上次 session 的输出作为本次证据
 - 禁止以"子 agent 报告成功"作为最终声称依据，必须独立验证 git diff / 测试输出
-- 禁止部分检查（只跑 mvn test 不跑 entropy-check）就标 pre-flight 全 pass
+- 禁止部分检查（只跑 vitest 不跑 tsc/biome/entropy-check）就标 pre-flight 全 pass
 
 ## 执行检查（每次写入上述文档后）
 1. 对照 `.claude/skills/verification-before-completion/SKILL.md` 的映射表，确认每条声称都有证据

@@ -3,7 +3,7 @@ name: verification-before-completion
 description: "任何声称'通过/完成/修复/无问题'之前必须运行验证命令并附证据。适用于 @dev/@architect/@qa/Ralph 在写入 handoff/test-report/dev-log 或口头汇报结果时。"
 user-invocable: false
 disable-model-invocation: true
-allowed-tools: "Read Bash(mvn *) Bash(./scripts/*) Bash(./.claude/skills/full-check/scripts/*) Bash(git *)"
+allowed-tools: "Read Bash(pnpm *) Bash(./scripts/*) Bash(./.claude/skills/full-check/scripts/*) Bash(git *)"
 ---
 
 # 声称前必须验证（Verification Before Completion）
@@ -43,11 +43,12 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 
 | 声称 | 必需证据 | 不充分 |
 |------|---------|--------|
-| 单测通过 | `mvn test` 输出 `BUILD SUCCESS` + 测试数 0 failures | 上次结果 / "应该能过" |
-| 架构合规 | `mvn test` 含 ArchUnit 14 条全过 | 仅编译通过 |
-| 代码风格合规 | `mvn checkstyle:check` 退出码 0 | 仅 IDE 提示 |
+| 类型通过 | `pnpm tsc --noEmit` 退出码 0 | IDE 无红波浪线 |
+| 单测通过 | `pnpm vitest run` 输出 `Tests: X passed, 0 failed` | 上次结果 / "应该能过" |
+| 架构合规 | `pnpm exec depcruise src` 退出码 0 + entropy-check 全过 | 仅类型通过 |
+| 代码风格合规 | `pnpm biome check src tests` 退出码 0 | 仅 IDE 提示 |
 | 熵检查通过 | `./scripts/entropy-check.sh` 退出码 0 | Hook 未报警 ≠ entropy 通过 |
-| 三项预飞通过 | 3 个命令 3 段输出齐全 | 只报"全绿" |
+| 四项预飞通过 | 4 个命令 4 段输出齐全 | 只报"全绿" |
 | Bug 已修复 | 重新运行复现命令 + 原失败用例现在通过 | 改了代码 / "我改了问题点" |
 | 回归测试有效 | Red-Green 循环：撤销修复 → 测试失败 → 恢复 → 测试通过 | "我写了一个测试" |
 | Agent 已完成 | `git diff` + `git log` 确认提交 | 子 agent 自述"成功" |
@@ -72,7 +73,7 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 | "我刚才跑过了" | 再跑一次。每条消息独立取证 |
 | "我很有信心" | 信心 ≠ 证据 |
 | "就这一次" | 没有例外 |
-| "Checkstyle 过了所以 mvn test 也过" | Checkstyle ≠ 编译 ≠ 测试 |
+| "Biome 过了所以 vitest 也过" | 风格 ≠ 类型 ≠ 测试 |
 | "子 agent 报告成功了" | 独立验证 git diff |
 | "部分检查够了" | 部分 = 未知 |
 | "我累了" | 疲倦 ≠ 借口 |
@@ -81,22 +82,24 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 ## claude-j 专项规则
 
 ### @dev 在 Build 阶段提交 QA 前
-在 `handoff.md` 的 `pre-flight:` 字段写入三项结果前，**必须**：
+在 `handoff.md` 的 `pre-flight:` 字段写入四项结果前，**必须**：
 ```bash
-mvn clean test -B
-mvn checkstyle:check -B
+pnpm tsc --noEmit
+pnpm vitest run
+pnpm biome check src tests
 ./scripts/entropy-check.sh
 ```
 在 `handoff.md` 的 `summary` 里附：
 ```
 pre-flight:
-  mvn-test: pass       # Tests run: 142, Failures: 0, Errors: 0
-  checkstyle: pass     # Exit 0
-  entropy-check: pass  # 12/12 checks passed
+  tsc: pass            # pnpm tsc --noEmit exit 0
+  vitest: pass         # Tests: 142 passed, 0 failed
+  biome: pass          # Checked 47 files, no fixes needed
+  entropy-check: pass  # 13/13 checks passed
 ```
 
 ### @qa 在 Verify 阶段声称验收通过前
-- **独立重跑三项**（不信任 @dev 的 pre-flight 标记）
+- **独立重跑四项**（不信任 @dev 的 pre-flight 标记）
 - test-report.md 的"验收结论"章节必须附每项命令的输出摘要
 
 ### Ralph 主 Agent 在推进阶段前

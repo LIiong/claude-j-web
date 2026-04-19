@@ -25,8 +25,7 @@
 ```bash
 ./scripts/bootstrap-project.sh \
   --project-name "my-app" \
-  --package-root "com.mycompany" \
-  --description "我的 DDD 项目" \
+  --description "我的 FSD 前端项目" \
   --target-dir /path/to/new-project
 ```
 
@@ -39,5 +38,5 @@
 ## 注意事项
 
 - 这些模板仅覆盖"方法论级"资产，不包含具体业务代码
-- 架构测试（ArchUnit 等）、熵扫描脚本在非 Java 项目中需按语言重写
-- 替换后请运行 `/ralph 001-hello-world 实现一个 hello 端点` 走通全流程以验证移植
+- 架构检查（dependency-cruiser 等）、熵扫描脚本在非 TypeScript 项目中需按语言重写
+- 替换后请运行 `/ralph 001-hello-world 实现一个最小页面` 走通全流程以验证移植

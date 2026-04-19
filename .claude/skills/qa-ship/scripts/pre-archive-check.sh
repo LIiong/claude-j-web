@@ -128,34 +128,43 @@ else
   fi
 fi
 
-# ------ 4. 三项 pre-flight 重跑 ------
+# ------ 4. 四项 pre-flight 重跑 ------
 echo ""
-echo "--- [4/4] 三项 pre-flight 重跑 ---"
+echo "--- [4/4] 四项 pre-flight 重跑 ---"
 if [ "$SKIP_REVERIFY" -eq 1 ]; then
   warn "已 --skip-reverify，跳过（请确保已另行验证）"
 else
-  echo "      预计耗时 2-5 分钟；如需快速预演请加 --skip-reverify"
+  echo "      预计耗时 1-3 分钟；如需快速预演请加 --skip-reverify"
   set +e
 
-  echo "      [4.1] mvn test ..."
-  mvn -q test >/tmp/pre-archive-mvn-test.log 2>&1
+  echo "      [4.1] pnpm tsc --noEmit ..."
+  pnpm tsc --noEmit >/tmp/pre-archive-tsc.log 2>&1
   RC=$?
   if [ $RC -eq 0 ]; then
-    pass "mvn test 通过"
+    pass "tsc --noEmit 通过"
   else
-    fail "mvn test 失败（RC=$RC，日志：/tmp/pre-archive-mvn-test.log）"
+    fail "tsc 失败（RC=$RC，日志：/tmp/pre-archive-tsc.log）"
   fi
 
-  echo "      [4.2] mvn checkstyle:check ..."
-  mvn -q checkstyle:check >/tmp/pre-archive-checkstyle.log 2>&1
+  echo "      [4.2] pnpm vitest run ..."
+  pnpm vitest run >/tmp/pre-archive-vitest.log 2>&1
   RC=$?
   if [ $RC -eq 0 ]; then
-    pass "mvn checkstyle:check 通过"
+    pass "vitest run 通过"
   else
-    fail "checkstyle 失败（RC=$RC，日志：/tmp/pre-archive-checkstyle.log）"
+    fail "vitest 失败（RC=$RC，日志：/tmp/pre-archive-vitest.log）"
   fi
 
-  echo "      [4.3] ./scripts/entropy-check.sh ..."
+  echo "      [4.3] pnpm biome check src tests ..."
+  pnpm biome check src tests >/tmp/pre-archive-biome.log 2>&1
+  RC=$?
+  if [ $RC -eq 0 ]; then
+    pass "biome check 通过"
+  else
+    fail "biome check 失败（RC=$RC，日志：/tmp/pre-archive-biome.log）"
+  fi
+
+  echo "      [4.4] ./scripts/entropy-check.sh ..."
   ./scripts/entropy-check.sh >/tmp/pre-archive-entropy.log 2>&1
   RC=$?
   if [ $RC -eq 0 ]; then

@@ -12,7 +12,7 @@ allowed-tools: "Read"
 
 ## 核心心智（一句话）
 
-> **任何 `src/main/java/` 下的业务改动都必须走 Ralph 5 阶段流水线。绕过 = 被 Hook 拦。**
+> **任何 `src/**/*.{ts,tsx}` 下的业务改动都必须走 Ralph 5 阶段流水线。绕过 = 被 Hook 拦。**
 
 ## 5 阶段交付流水线
 
@@ -46,7 +46,7 @@ Spec → Review → Build → Verify → Ship
 | 超大需求多会话 | `/ralph <task-id> --loop` | 输出 ralph-loop.sh 命令 |
 | 单阶段操作 | `/dev-spec` / `/architect-review` / `/dev-build` / `/qa-verify` / `/qa-ship` | 各阶段独立入口 |
 | 查看任务状态 | `/task-status [task-id]` | 进度一览 |
-| 交付前验证 | `/full-check` | mvn test + checkstyle + entropy-check |
+| 交付前验证 | `/full-check` | tsc + vitest + biome + entropy-check |
 | 接收 code review 反馈 | `/receiving-code-review <task-id>` | @qa 打回后结构化修复 |
 | 多任务并行 | `/using-git-worktrees` | worktree 隔离 |
 
@@ -75,9 +75,9 @@ Spec → Review → Build → Verify → Ship
 以下任一成立 → **停下，不要直接编码**，先明确用什么 skill / 走哪个阶段：
 
 - 用户说"改一下 X" 但 `docs/exec-plan/active/` 下无相关任务 → 问：这是新任务吗？要走 `/ralph` 吗？
-- 准备写 `src/main/java/**` 但没有 `handoff.md` 或 handoff 状态不是 `approved` → 会被 `guard-dev-gate.sh` 拦；先完成 Spec + Review
-- `.claude-current-role` 里是 `qa`，但用户让你改 `src/main/java/` → 写作域越权，`guard-agent-scope.sh` 会拦
-- 声称"搞定了/修好了"但没跑 `mvn test` → 违反铁律②（VERIFICATION）
+- 准备写 `src/**/*.{ts,tsx}` 但没有 `handoff.md` 或 handoff 状态不是 `approved` → 会被 `guard-dev-gate.sh` 拦；先完成 Spec + Review
+- `.claude-current-role` 里是 `qa`，但用户让你改 `src/**/*.{ts,tsx}` → 写作域越权，`guard-agent-scope.sh` 会拦
+- 声称"搞定了/修好了"但没跑 `pnpm vitest run` → 违反铁律②（VERIFICATION）
 
 ## 三条铁律（零例外）
 
@@ -99,8 +99,9 @@ Spec → Review → Build → Verify → Ship
 | 问题 | 去哪查 |
 |------|-------|
 | 架构分层 | `docs/architecture/overview.md`, `.claude/rules/architecture.md` |
-| Java 规则 | `docs/standards/java-dev.md` |
-| 测试规则 | `docs/standards/java-test.md` |
+| TS/FSD 开发规则 | `.claude/rules/ts-dev.md` |
+| 测试规则 | `.claude/rules/ts-test.md` |
+| UI 规范 | `docs/standards/ui-guidelines.md` |
 | ADR 决策 | `docs/architecture/decisions/` |
 | Agent 协作 | `.claude/rules/agent-collaboration.md` |
 | Karpathy | `.claude/rules/karpathy-guidelines.md` |

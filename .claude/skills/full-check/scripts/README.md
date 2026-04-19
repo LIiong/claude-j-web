@@ -6,8 +6,8 @@
 
 | 脚本 | 作用 | 被调用方 |
 |------|------|---------|
-| `entropy-check.sh` | 架构漂移检测（12 项全局一致性扫描，L3 守护） | full-check / dev-build / architect-review / qa-verify / post-commit Hook |
-| `quick-check.sh` | 快速三项检查（编译 + 单测 + 风格） | full-check / dev-build / post-commit Hook |
+| `entropy-check.sh` | 架构漂移检测（13 项全局一致性扫描，L3 守护） | full-check / dev-build / architect-review / qa-verify / post-commit Hook |
+| `quick-check.sh` | 快速四项检查（tsc + vitest + biome） | full-check / dev-build / post-commit Hook |
 
 ## 使用方式
 
@@ -29,7 +29,7 @@
 
 ## 为什么放在 full-check skill 里
 
-这两个脚本本质上是 full-check skill 的核心实现 —— full-check 做的事就是"运行这两个脚本 + mvn test 并汇总结果"。其他 skill（dev-build / qa-verify 等）对这两个脚本的依赖可理解为"调用 full-check 的子能力"。
+这两个脚本本质上是 full-check skill 的核心实现 —— full-check 做的事就是"运行这两个脚本 + pnpm vitest run 并汇总结果"。其他 skill（dev-build / qa-verify 等）对这两个脚本的依赖可理解为"调用 full-check 的子能力"。
 
 ## 符号链接
 

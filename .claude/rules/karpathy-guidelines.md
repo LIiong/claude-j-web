@@ -7,7 +7,7 @@ alwaysApply: true
 
 # 四项心智原则（Karpathy Guidelines）
 
-> 源自 Andrej Karpathy 对 LLM 编码常见错误的观察（["The models make wrong assumptions on your behalf and just run along with them without checking."](https://x.com/karpathy/status/2015883857489522876)），本土化到 claude-j 的 DDD/六边形语境。
+> 源自 Andrej Karpathy 对 LLM 编码常见错误的观察（["The models make wrong assumptions on your behalf and just run along with them without checking."](https://x.com/karpathy/status/2015883857489522876)），本土化到 claude-j-web 的 Next.js + FSD 语境。
 >
 > **定位**：这是**心智原则**，不是检查项。它约束 *态度* 而不是 *流程*。
 > 与「三条心智铁律」（TDD/VERIFICATION/DEBUG）的区别：铁律管"绝对不能越过的线"，原则管"面对选择时默认往哪偏"。
@@ -41,21 +41,21 @@ alwaysApply: true
 - **不加需求外的功能**：需求要"按金额筛选"，不要顺手加"按日期筛选"。
 - **一次性代码不抽象**：只被一处调用的工具类 = 过早抽象。等第二处出现再说。
 - **不要"灵活性 / 可配置性"**：用户没要就不要。参数化每多一层，心智成本翻倍。
-- **不为不可能的场景写 try/catch**：Domain 层抛 BusinessException 就抛，别包一层"万一"。
+- **不为不可能的场景写 try/catch**：entities 层抛 typed Error 就抛，别包一层"万一"。
 - **200 行能做到 50 行，重写**。
 
 **自问**：资深工程师会不会说"这写得太绕了"？会 → 重写。
 
 **本土化触发点**：
-- 新聚合别照搬老聚合全部文件——先问哪些是真的需要的（例如新聚合可能不需要领域服务）。
-- Application Service 一方法一事务，别建 Orchestrator/Facade 抽象层（除非已有 3 个以上同类服务）。
-- Request/Response/DTO/Domain/DO 四层映射已由规则保证 — 不要再发明"视图模型 VM"之类的第五层。
-- 测试命名 `should_xxx_when_yyy` 够用，别再写 BDD 风格 `Given...When...Then` 嵌套类。
+- 新 slice 别照搬老 slice 全部文件——先问哪些是真的需要的（例如简单展示型 feature 可能不需要 store）。
+- feature hook / use case 一函数一职责，别建 Orchestrator/Facade 抽象层（除非已有 3 个以上同类 hook）。
+- API Response ↔ DTO (Zod) ↔ Entity ↔ UI Model 四层映射已由规则保证 — 不要再发明"视图模型 VM"之类的第五层。
+- 测试命名 `should_xxx_when_yyy` 够用，别再写 BDD 风格 `Given...When...Then` 嵌套 describe。
 
 **反模式信号**：
 - 写了 `XxxFactory` / `XxxBuilder` / `XxxStrategy` 却只有 1 个实现 → 去掉
-- `@Configuration` 里超过 5 个 `@ConditionalOn*` → 过度配置
-- 一个方法 > 40 行 或 一个类 > 300 行 → 考虑拆，但别为拆而拆
+- 组件 props 超过 10 个、或 5+ 个布尔 flag → 考虑拆分/用 discriminated union
+- 一个函数 > 40 行 或 一个文件 > 300 行 → 考虑拆，但别为拆而拆
 
 ---
 
@@ -67,7 +67,7 @@ alwaysApply: true
 
 - **别"顺手优化"相邻代码、注释、格式**。即使看着碍眼。
 - **别重构没坏的东西**。看不惯的写法不是"坏"。
-- **匹配既有风格**——哪怕你会换个写法。claude-j 的 `@Getter` + 静态 `toDomain()` 就是风格，不要在某个聚合突然切成 MapStruct。
+- **匹配既有风格**——哪怕你会换个写法。claude-j-web 的 `readonly` 字段 + 静态 `toDomain()` mapper 就是风格，不要在某个 slice 突然切成 class-transformer/io-ts。
 - **发现无关死代码 → 口头提一下，不要删**。留给用户决定。
 
 你的改动产生的孤儿：
@@ -78,13 +78,13 @@ alwaysApply: true
 **单行测试**：每一行改动，都能回答"为什么这行在我修改需求的范围内"？答不上来 → 回退。
 
 **本土化触发点**：
-- 修 `OrderApplicationService` 某个方法的 bug → 只改那个方法 + 对应测试。**别顺手** rename 其他方法、**别顺手**调整 import 顺序、**别顺手**升级 Lombok 用法。
-- Adapter 层加一个新端点 → 不要趁机重构 `GlobalExceptionHandler`。
-- Infrastructure 层加一张表 → 不要趁机改其他聚合的索引。
+- 修 `useOrderCheckout` 某个分支的 bug → 只改那个分支 + 对应测试。**别顺手** rename 其他 hook、**别顺手**调整 import 顺序、**别顺手**把 `useState` 切成 Zustand。
+- `app/` 加一个新路由 → 不要趁机重构全局 `error.tsx` / `not-found.tsx`。
+- `shared/api/` 加一个新端点 → 不要趁机改其他 slice 的 Zod schema。
 
 **与 guard-agent-scope 的关系**：
 - Hook 管"跨角色越权"（@dev 不能改 test-report.md）。
-- 本条管"同角色内越权"（@dev 改 A 聚合时不碰 B 聚合）。两层互补。
+- 本条管"同角色内越权"（@dev 改 A slice 时不碰 B slice）。两层互补。
 
 ---
 
@@ -98,20 +98,20 @@ alwaysApply: true
 |---|---|
 | "加校验" | "写针对空/超长/非法字符的测试，先红再绿" |
 | "修 bug" | "写复现测试用例，先红，修后绿" |
-| "重构 X" | "改之前 mvn test 全绿，改之后 mvn test 仍全绿" |
-| "优化性能" | "基线跑 X ms，目标 < Y ms，用 JMH 测量" |
+| "重构 X" | "改之前 pnpm vitest run 全绿，改之后 pnpm vitest run 仍全绿" |
+| "优化性能" | "基线跑 X ms，目标 < Y ms，用 Lighthouse / React Profiler 测量" |
 
 **多步任务先给计划**：
 ```
-1. 写 Domain 聚合 + 值对象测试 → verify: mvn test -pl claude-j-domain
-2. 写 Application 服务 + Mock Repo 测试 → verify: mvn test -pl claude-j-application
-3. 写 Infrastructure 实现 + H2 集成测试 → verify: mvn test -pl claude-j-infrastructure
-4. 写 Adapter Controller + MockMvc 测试 → verify: mvn test -pl claude-j-adapter
-5. 三项预飞 → verify: mvn test && mvn checkstyle:check && ./scripts/entropy-check.sh 全过
+1. 写 entities 值对象 / 聚合 + 纯 Vitest 测试 → verify: pnpm vitest run src/entities
+2. 写 shared/api DTO + Zod schema + mapper 单测 → verify: pnpm vitest run src/shared/api
+3. 写 features/model hook / store + MSW 单测 → verify: pnpm vitest run src/features
+4. 写 features/ui + widgets 组件 + RTL 测试 → verify: pnpm vitest run src/features src/widgets
+5. 四项预飞 → verify: pnpm tsc --noEmit && pnpm vitest run && pnpm biome check src tests && ./scripts/entropy-check.sh 全过
 ```
 
 **本土化触发点**：
-- `requirement-design.md` 的「验收条件」必须可逐条转成 `should_xxx_when_yyy` 测试（@architect 12 项 checklist 已纳入）。
+- `requirement-design.md` 的「验收条件」必须可逐条转成 `should_xxx_when_yyy` 测试（@architect checklist 已纳入）。
 - `task-plan.md` 原子任务必须含「验证命令 + 预期输出」（模板 P1-④ 已强制）。
 - 强目标 → 强到 @dev 可以独立闭环；弱目标 → 每步都要回头问人。
 
@@ -142,8 +142,8 @@ alwaysApply: true
 |---|---|
 | 三条心智铁律（TDD/VERIFICATION/DEBUG） | 绝对红线，越过即作废 |
 | 本规则（四项原则） | 默认方向，面对选择时偏哪边 |
-| `java-dev.md` / `java-test.md` | Java/DDD 语法与分层约束 |
-| `architecture.md` / `entropy-guard.md` | 六边形边界与熵防御 |
+| `ts-dev.md` / `ts-test.md` | TS/FSD 语法与分层约束 |
+| `architecture.md` / `entropy-guard.md` | FSD 边界与熵防御 |
 | `agent-collaboration.md` | 多 Agent 写作域 |
 
 四者层级不同：铁律 > 规则 > 标准 > 原则。但**原则没有例外场景**——所有任务都先往这四条上靠。

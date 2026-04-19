@@ -35,7 +35,7 @@ echo "qa" > .claude-current-role
 1. `handoff.md` 含 `status: approved`（兼容 YAML / Markdown 加粗两种写法）且 `to` ∈ {qa, ralph}
 2. `test-report.md` 末尾含「验收通过」
 3. `task-plan.md` QA 行状态非「待办 / 进行中 / 待验收 / 待修复」
-4. 重跑 `mvn test` + `mvn checkstyle:check` + `./scripts/entropy-check.sh` 三项全退 0
+4. 重跑 `pnpm tsc --noEmit` + `pnpm vitest run` + `pnpm biome check src tests` + `./scripts/entropy-check.sh` 四项全退 0
 
 任一失败 → 终止归档并按脚本输出的修复清单处理。  
 快速预演可加 `--skip-reverify` 暂跳过第 4 项（生产归档禁止跳过）。
@@ -47,9 +47,9 @@ mv docs/exec-plan/active/$ARGUMENTS/ docs/exec-plan/archived/$ARGUMENTS/
 ```
 
 ### 3. 同步 CLAUDE.md 聚合列表
-对比 `claude-j-domain/src/main/java/com/claudej/domain/` 下子目录与 CLAUDE.md「当前聚合」表格：
-- 若本任务引入新聚合，在表格追加一行（聚合名、包名、说明）
-- 若仅扩展已有聚合，无需改动
+对比 `src/entities/` / `src/features/` 下 slice 目录与 CLAUDE.md「当前聚合」表格：
+- 若本任务引入新 slice，在表格追加一行（层、slice 名、说明）
+- 若仅扩展已有 slice，无需改动
 
 ### 4. 确认 ADR 完整
 ```bash

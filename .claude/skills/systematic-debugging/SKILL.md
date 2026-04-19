@@ -3,7 +3,7 @@ name: systematic-debugging
 description: "遇到测试失败/缺陷/意外行为时强制走 4 阶段根因调查。适用于 @dev 处理 QA 问题清单、测试失败排查、production 报障等。禁止先修再调查。"
 user-invocable: false
 disable-model-invocation: true
-allowed-tools: "Read Bash(mvn *) Bash(git *) Bash(./scripts/*) Bash(./.claude/skills/full-check/scripts/*) Grep Glob"
+allowed-tools: "Read Bash(pnpm *) Bash(git *) Bash(./scripts/*) Bash(./.claude/skills/full-check/scripts/*) Grep Glob"
 ---
 
 # 系统化调试（Systematic Debugging）
@@ -30,7 +30,7 @@ Phase 1 未完成 → 不得提出修复方案。
 - 意外行为
 - 性能问题
 - 构建失败
-- 跨层集成异常（adapter ↔ application ↔ domain ↔ infrastructure）
+- 跨层集成异常（app ↔ widgets ↔ features ↔ entities ↔ shared）
 
 **越紧急越要用**：
 - 时间压力下（紧急情况下猜测最诱人，但错误代价最大）
@@ -71,39 +71,45 @@ git diff HEAD~5 -- <suspect-area>
 - 什么改动可能导致？
 - 新依赖、配置变更、环境差异？
 
-#### 1.4 多层系统诊断（claude-j 专用）
+#### 1.4 多层系统诊断（claude-j-web 专用）
 
-claude-j 是六边形架构，问题可能在任一边界。**为每个边界插诊断日志收集证据，再定位哪一层失败：**
+claude-j-web 是 FSD 分层，问题可能在任一边界。**为每个边界插诊断日志收集证据，再定位哪一层失败：**
 
 ```
-Adapter boundary（入口）
-  └─ 入参：Request/Response、@Valid 错误
-  └─ 出参：HTTP 状态码、Result<T> 结构
-Application boundary（编排）
-  └─ 入参：Command/DTO
-  └─ 出参：是否调对 Repository、事务边界
-Domain boundary（领域规则）
-  └─ 入参：值对象、实体状态
-  └─ 不变量：是否抛 BusinessException
-Infrastructure boundary（持久化）
-  └─ 入参：Domain → DO 转换
-  └─ 出参：MyBatis SQL 参数、DB 返回
+app / widgets（Next.js 路由 + 页面装配）
+  └─ 入参：URL / searchParams / props
+  └─ 出参：RSC 输出、hydration 错误
+features/ui（React 组件）
+  └─ 入参：UI Model、事件 payload
+  └─ 出参：DOM 结构、调用的 hook / store
+features/model（hook / store / use case）
+  └─ 入参：action / command
+  └─ 状态：store 快照、query 缓存键
+features/api（mapper / use case）
+  └─ 入参：DTO
+  └─ 出参：Entity / API Response
+shared/api（HTTP 客户端 + Zod schema）
+  └─ 入参：URL、headers、body
+  └─ 出参：response 状态码、Zod parse 结果
+entities（纯 TS 领域层）
+  └─ 输入：值对象、实体状态
+  └─ 不变量：命名方法是否抛 typed Error
 ```
 
-**示例诊断脚本**（临时调试用，修复后必删）：
-```java
-// Adapter 层
-log.debug("[adapter-in] request={}", request);
-log.debug("[adapter-out] response={}, status={}", response, status);
+**示例诊断日志**（临时调试用，修复后必删）：
+```ts
+// features/ui
+console.debug("[ui]", { props, event });
 
-// Application 层
-log.debug("[app-in] command={}", command);
-log.debug("[app-out] aggregate-state={}", aggregate);
+// features/model
+console.debug("[model]", { command, storeSnapshot: get() });
 
-// Infrastructure 层
-log.debug("[infra-in] domain={}", domain);
-log.debug("[infra-sql] do={}", doObj);
-log.debug("[infra-out] saved-id={}", id);
+// shared/api
+console.debug("[api-in]", { url, body });
+console.debug("[api-out]", { status, parsed: schema.safeParse(json) });
+
+// entities
+console.debug("[entity]", { before, after });
 ```
 
 跑一次 → 看哪一层的入参正常、哪一层的出参异常 → 那一层就是嫌疑人。
@@ -124,11 +130,11 @@ log.debug("[infra-out] saved-id={}", id);
 动手改之前：
 
 #### 2.1 找工作的例子
-- 同 codebase 里有没有类似能跑通的代码？（如已实现的 shortlink 聚合）
+- 同 codebase 里有没有类似能跑通的代码？（如已实现的 user slice）
 - 能跑通的和坏掉的差在哪？
 
 #### 2.2 对照参考实现
-- 如果是实现某个已知模式（如 Repository、Converter），读**整个**参考实现
+- 如果是实现某个已知模式（如 feature hook、DTO mapper），读**整个**参考实现
 - 不要跳读，每行都看
 - 先完全理解，再动手
 
@@ -170,7 +176,7 @@ log.debug("[infra-out] saved-id={}", id);
 
 #### 4.1 创建失败测试用例
 - 最小可复现
-- 自动化测试（优先 JUnit 5）
+- 自动化测试（优先 Vitest；UI 层用 RTL；关键路径用 Playwright）
 - **必须先看到 RED**（参考 `.claude/skills/verification-before-completion/SKILL.md` 的 Red-Green-Refactor）
 
 #### 4.2 单一修复
@@ -180,7 +186,7 @@ log.debug("[infra-out] saved-id={}", id);
 
 #### 4.3 验证修复
 - 新测试从 RED → GREEN？
-- 其他测试有没有被破坏？`mvn test` 全量
+- 其他测试有没有被破坏？`pnpm vitest run` 全量
 - 原症状彻底消失？
 
 #### 4.4 修复失败时
@@ -237,7 +243,7 @@ log.debug("[infra-out] saved-id={}", id);
 ### @dev 处理 QA changes-requested 时
 1. 读 `test-report.md` 问题清单
 2. **必须先走 Phase 1**：逐条问题读 stack trace、定位源头层、追踪数据流
-3. 不得在未完成 Phase 1 前编辑 src/main/java/
+3. 不得在未完成 Phase 1 前编辑 src/**/*.{ts,tsx}
 4. 每个问题的修复必须带：失败测试 → 修复 → 测试通过的证据（参考 verification-before-completion）
 5. 若同一 bug 第 3 次修复仍失败 → 在 `dev-log.md` 记录"架构质疑"，通过 handoff 升级到人类介入
 

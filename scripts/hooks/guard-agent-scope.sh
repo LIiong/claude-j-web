@@ -39,9 +39,11 @@ ROLE=$(cat "$ROLE_FILE" 2>/dev/null | tr -d '[:space:]')
 
 case "$ROLE" in
     qa)
-        # @qa 禁止写入 src/main/java/
-        if [[ "$FILE_PATH" == */src/main/java/*.java ]]; then
-            echo "❌ AGENT SCOPE: @qa 禁止写入业务代码 (src/main/java/)" >&2
+        # @qa 禁止写入业务源码（src/**/*.ts, src/**/*.tsx），测试文件除外
+        if [[ ( "$FILE_PATH" == */src/*.ts || "$FILE_PATH" == */src/*.tsx ) \
+              && "$FILE_PATH" != *.test.ts && "$FILE_PATH" != *.test.tsx \
+              && "$FILE_PATH" != *.spec.ts && "$FILE_PATH" != *.spec.tsx ]]; then
+            echo "❌ AGENT SCOPE: @qa 禁止写入业务源码（src/**/*.{ts,tsx}）" >&2
             echo "   发现问题请通知 @dev 修复，不要自行修改业务代码" >&2
             exit 2
         fi
@@ -53,9 +55,9 @@ case "$ROLE" in
         fi
         ;;
     architect)
-        # @architect 禁止写入任何 Java 文件
-        if [[ "$FILE_PATH" == *.java ]]; then
-            echo "❌ AGENT SCOPE: @architect 禁止写入 Java 代码" >&2
+        # @architect 禁止写入任何 TS/TSX 源文件（含测试）
+        if [[ "$FILE_PATH" == *.ts || "$FILE_PATH" == *.tsx ]]; then
+            echo "❌ AGENT SCOPE: @architect 禁止写入 TS/TSX 代码" >&2
             echo "   架构评审仅修改文档，不直接修改代码" >&2
             exit 2
         fi

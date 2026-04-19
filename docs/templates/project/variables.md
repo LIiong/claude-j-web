@@ -13,14 +13,12 @@
 ```bash
 ./scripts/bootstrap-project.sh \
   --project-name "my-app" \
-  --package-root "com.mycompany" \
-  --description "My new DDD project"
+  --description "My new FSD project"
 ```
 
 ### 方法 C：envsubst
 ```bash
 export PROJECT_NAME=my-app
-export PACKAGE_ROOT=com.mycompany
 # ... 其他变量
 envsubst < CLAUDE.template.md > CLAUDE.md
 ```
@@ -32,57 +30,59 @@ envsubst < CLAUDE.template.md > CLAUDE.md
 ### 项目身份
 | 变量名 | 默认值 | 说明 |
 |-------|--------|------|
-| `PROJECT_NAME` | `example-app` | 项目名（kebab-case），用于目录、模块名 |
-| `PROJECT_DESCRIPTION` | `示例 DDD 项目` | 一句话项目描述 |
+| `PROJECT_NAME` | `example-web` | 项目名（kebab-case），用于目录、包名 |
+| `PROJECT_DESCRIPTION` | `示例 FSD 前端项目` | 一句话项目描述 |
 | `PROJECT_OWNER` | `team-name` | 团队/所有者名称 |
 
 ### 技术栈
 | 变量名 | 默认值 | 说明 |
 |-------|--------|------|
-| `LANGUAGE` | `Java` | 主要编程语言 |
-| `LANGUAGE_VERSION` | `Java 8` | 语言版本 |
-| `FRAMEWORK` | `Spring Boot 2.7.18` | 主框架 + 版本 |
-| `BUILD_TOOL` | `Maven` | 构建工具 |
-| `ORM` | `MyBatis-Plus 3.5.5` | 持久化框架 |
-| `MAPPER_TOOL` | `MapStruct 1.5.5` | 对象映射工具 |
-| `TEST_FRAMEWORK` | `JUnit 5 + AssertJ + Mockito` | 测试栈 |
-| `DB_DEV` | `H2` | 开发数据库 |
-| `DB_PROD` | `MySQL 8` | 生产数据库 |
+| `LANGUAGE` | `TypeScript` | 主要编程语言 |
+| `LANGUAGE_VERSION` | `TypeScript 5.6` | 语言版本 |
+| `FRAMEWORK` | `Next.js 15 (App Router + RSC)` | 主框架 + 版本 |
+| `BUILD_TOOL` | `pnpm 9` | 包管理 / 构建工具 |
+| `STATE_MGMT` | `Zustand + TanStack Query v5` | 状态管理 |
+| `SCHEMA_TOOL` | `Zod` | 运行时 schema / 表单验证 |
+| `TEST_FRAMEWORK` | `Vitest + RTL + MSW + Playwright` | 测试栈 |
+| `STYLE_TOOL` | `Tailwind CSS 4 + shadcn/ui` | 样式 / 组件库 |
+| `LINT_TOOL` | `Biome` | lint + 格式化 |
 
-### 命名空间
+### 目录结构（FSD 分层）
 | 变量名 | 默认值 | 说明 |
 |-------|--------|------|
-| `PACKAGE_ROOT` | `com.example` | 根包名 / 根命名空间 |
-| `MODULE_DOMAIN` | `${PROJECT_NAME}-domain` | 领域层模块 |
-| `MODULE_APPLICATION` | `${PROJECT_NAME}-application` | 应用层模块 |
-| `MODULE_INFRASTRUCTURE` | `${PROJECT_NAME}-infrastructure` | 基础设施模块 |
-| `MODULE_ADAPTER` | `${PROJECT_NAME}-adapter` | 适配器模块 |
-| `MODULE_START` | `${PROJECT_NAME}-start` | 启动模块 |
+| `PATH_ALIAS` | `@/*` → `src/*` | 路径别名 |
+| `LAYER_APP` | `src/app/` | Next.js App Router 入口 |
+| `LAYER_WIDGETS` | `src/widgets/` | 页面级组合 |
+| `LAYER_FEATURES` | `src/features/` | 单一用户场景 |
+| `LAYER_ENTITIES` | `src/entities/` | 纯 TS 业务模型 |
+| `LAYER_SHARED` | `src/shared/` | 基础层（ui / api / lib / config） |
 
 ### 构建命令
-| 变量名 | 默认值（Maven） | 其他栈示例 |
+| 变量名 | 默认值（pnpm） | 其他栈示例 |
 |-------|----------------|-----------|
-| `CMD_BUILD_ALL` | `mvn clean install` | `pnpm build` / `gradle build` |
-| `CMD_RUN_TESTS` | `mvn test` | `pnpm test` / `pytest` |
-| `CMD_RUN_DEV` | `mvn spring-boot:run -pl ${MODULE_START} -Dspring-boot.run.profiles=dev` | `pnpm dev` / `uvicorn main:app --reload` |
-| `CMD_STYLE_CHECK` | `mvn checkstyle:check` | `pnpm lint` / `ruff check` |
-| `CMD_ARCH_TEST` | `mvn test`（ArchUnit 类） | 见具体栈 |
+| `CMD_BUILD_ALL` | `pnpm build` | `npm run build` / `yarn build` |
+| `CMD_RUN_TESTS` | `pnpm vitest run` | `pnpm jest` / `npm test` |
+| `CMD_RUN_DEV` | `pnpm dev` | `npm run dev` / `yarn dev` |
+| `CMD_TYPE_CHECK` | `pnpm tsc --noEmit` | `npx tsc --noEmit` |
+| `CMD_STYLE_CHECK` | `pnpm biome check src tests` | `pnpm lint` / `eslint src` |
+| `CMD_ARCH_CHECK` | `pnpm exec depcruise src` | 自定义脚本 |
+| `CMD_E2E` | `pnpm playwright test` | `pnpm cypress run` |
 | `CMD_QUICK_CHECK` | `./scripts/quick-check.sh` | 同名脚本适配 |
 | `CMD_ENTROPY_CHECK` | `./scripts/entropy-check.sh` | 同名脚本适配 |
 
 ### 架构量化
 | 变量名 | 默认值 | 说明 |
 |-------|--------|------|
-| `ARCHUNIT_RULE_COUNT` | `14` | 架构测试规则数 |
-| `ENTROPY_CHECK_COUNT` | `12` | 熵扫描检查项数 |
+| `DEPCRUISE_RULE_COUNT` | `8` | dependency-cruiser 规则数（参考值） |
+| `ENTROPY_CHECK_COUNT` | `13` | 熵扫描检查项数 |
 
 ### 命名约定
 | 变量名 | 默认值 | 说明 |
 |-------|--------|------|
-| `TABLE_PREFIX` | `t_` | 数据库表名前缀 |
-| `COLUMN_CASE` | `snake_case` | 列命名风格 |
-| `CLASS_CASE` | `PascalCase` | 类命名 |
-| `METHOD_CASE` | `camelCase` | 方法/函数命名 |
+| `FILE_CASE` | `kebab-case`（非组件） / `PascalCase`（React 组件） | 文件命名 |
+| `COMPONENT_CASE` | `PascalCase` | React 组件 |
+| `HOOK_CASE` | `use` + `camelCase` | Hook 命名 |
+| `EXPORT_STYLE` | 命名导出优先（entities/features/widgets 强制） | 导出风格 |
 | `TEST_NAMING_PATTERN` | `should_{行为}_when_{条件}` | 测试命名规范 |
 
 ---

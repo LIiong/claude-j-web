@@ -1,0 +1,4 @@
+# 本目录由 scripts/api-sync.sh 写入：
+#   schema.d.ts         — openapi-typescript 生成（gitignored）
+#   .schema.sha256      — 契约指纹（tracked）
+#   .schema.meta.json   — 同步元信息（tracked）
