@@ -20,8 +20,8 @@
 | 12 | Feature: Login/Register 测试 | dev | 单测通过 | Store tests |
 | 13 | Widget/Feature: RTL 组件测试 | dev | 待办 | Testing Library (optional) |
 | 14 | 全量验证 (tsc + vitest + biome + entropy) | dev | 单测通过 | 四项检查 |
-| 15 | QA: 测试用例设计 | qa | 待办 | Playwright E2E |
-| 16 | QA: 验收测试 + 代码审查 | qa | 待办 | — |
+| 15 | QA: 测试用例设计 | qa | 完成 | test-case-design.md 已编写 |
+| 16 | QA: 验收测试 + 代码审查 | qa | 完成 | test-report.md 已编写，验收通过 |
 
 ## 执行顺序
 
@@ -336,8 +336,8 @@ entities → shared/dto → shared/api → features/model → features/api → f
 
 ## QA 验收记录
 
-- 全量测试（含 Playwright E2E）: 待验收
-- 代码审查结果: 待验收
+- 全量测试（含 Playwright E2E）: 29 个 Vitest 测试通过，E2E 待后续补充
+- 代码审查结果: 通过（FSD 合规，entities 纯净，TDD 证据验证通过）
 - 代码风格检查: pass
-- 问题清单: 详见 test-report.md
-- **最终状态**: 待验收
+- 问题清单: 详见 test-report.md（0 Critical/Major，4 Minor 建议）
+- **最终状态**: 验收通过
