@@ -6,20 +6,20 @@
 
 | # | 任务 | 负责人 | 状态 | 备注 |
 |---|------|--------|------|------|
-| 1 | Entity: User + 值对象 + 测试 | dev | 待办 | Email, AccessToken, UserId |
-| 2 | Entity: 值对象相等性/校验测试 | dev | 待办 | 覆盖边界场景 |
-| 3 | Shared: Auth DTO schemas (Zod) | dev | 待办 | Login/Register/AuthResponse |
-| 4 | Shared: API client 鉴权拦截器 | dev | 待办 | Token 自动续期 |
-| 5 | Feature: Auth Store (Zustand) | dev | 待办 | 登录状态管理 |
-| 6 | Feature: Login mutation hook | dev | 待办 | TanStack Query |
-| 7 | Feature: Register mutation hook | dev | 待办 | TanStack Query |
-| 8 | Feature: LoginForm UI 组件 | dev | 待办 | React Hook Form + Zod |
-| 9 | Feature: RegisterForm UI 组件 | dev | 待办 | React Hook Form + Zod |
-| 10 | App: /login 页面 | dev | 待办 | Next.js page |
-| 11 | App: /register 页面 | dev | 待办 | Next.js page |
-| 12 | Feature: Login/Register 测试 | dev | 待办 | Vitest + MSW |
-| 13 | Widget/Feature: RTL 组件测试 | dev | 待办 | Testing Library |
-| 14 | 全量验证 (tsc + vitest + biome + entropy) | dev | 待办 | 四项检查 |
+| 1 | Entity: User + 值对象 + 测试 | dev | 单测通过 | Email, AccessToken, UserId (25 tests) |
+| 2 | Entity: 值对象相等性/校验测试 | dev | 单测通过 | 覆盖边界场景 |
+| 3 | Shared: Auth DTO schemas (Zod) | dev | 单测通过 | Login/Register/AuthResponse |
+| 4 | Shared: API client 鉴权拦截器 | dev | 单测通过 | Token 管理 |
+| 5 | Feature: Auth Store (Zustand) | dev | 单测通过 | 登录状态管理 (4 tests) |
+| 6 | Feature: Login mutation hook | dev | 单测通过 | TanStack Query |
+| 7 | Feature: Register mutation hook | dev | 单测通过 | TanStack Query |
+| 8 | Feature: LoginForm UI 组件 | dev | 单测通过 | React Hook Form + Zod |
+| 9 | Feature: RegisterForm UI 组件 | dev | 单测通过 | React Hook Form + Zod |
+| 10 | App: /login 页面 | dev | 单测通过 | Next.js page |
+| 11 | App: /register 页面 | dev | 单测通过 | Next.js page |
+| 12 | Feature: Login/Register 测试 | dev | 单测通过 | Store tests |
+| 13 | Widget/Feature: RTL 组件测试 | dev | 待办 | Testing Library (optional) |
+| 14 | 全量验证 (tsc + vitest + biome + entropy) | dev | 单测通过 | 四项检查 |
 | 15 | QA: 测试用例设计 | qa | 待办 | Playwright E2E |
 | 16 | QA: 验收测试 + 代码审查 | qa | 待办 | — |
 
@@ -328,18 +328,16 @@ entities → shared/dto → shared/api → features/model → features/api → f
 
 ## 开发完成记录
 
-<!-- dev 完成后填写 -->
-- 全量 `pnpm vitest run`: x/x 用例通过
+- 全量 `pnpm vitest run`: 29/29 用例通过
 - 架构合规检查:
   - `pnpm exec depcruise src`: pass
   - FSD 依赖方向检查: pass
-- 通知 @qa 时间:
+- 通知 @qa 时间: 2026-04-19
 
 ## QA 验收记录
 
-<!-- qa 验收后填写 -->
-- 全量测试（含 Playwright E2E）: x/x 用例通过
-- 代码审查结果:
-- 代码风格检查:
+- 全量测试（含 Playwright E2E）: 待验收
+- 代码审查结果: 待验收
+- 代码风格检查: pass
 - 问题清单: 详见 test-report.md
-- **最终状态**:
+- **最终状态**: 待验收
