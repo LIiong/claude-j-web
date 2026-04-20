@@ -1,8 +1,8 @@
 ---
 task-id: "002-order-cart"
-from: dev
-to: qa
-status: pending-review
+from: qa
+to: dev
+status: changes-requested
 timestamp: "2025-04-19T20:30:00"
 task-type: frontend
 ui-surface: true
@@ -16,7 +16,7 @@ pre-flight:
   vitest: pass # Tests: 129 passed, 0 failed
   biome: pass # Checked 76 files, 12 lint warnings (a11y)
   entropy-check: pass # 13/13 checks passed (2 WARN acceptable)
-summary: "Fix 阶段完成 - 修复 QA 发现的 4 Major + 1 Critical 问题，等待 QA 重新验收"
+summary: "Fix 阶段完成 - 但 QA 发现 1 个 Major 问题待修复：OrderCard.tsx a11y 错误 (role=button 应改为 button 元素)。等待 @dev 修复后 Ship。"
 ---
 
 # Handoff 文档 (修复轮 - 第1轮)
