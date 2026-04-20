@@ -48,6 +48,8 @@ app → widgets → features → entities ← shared
 | 层 | Slice | 说明 |
 |----|-------|------|
 | entities | user | 用户聚合（User实体 + Email/AccessToken/UserId/UserStatus值对象）|
+| entities | order | 订单聚合（Order实体 + OrderItem值对象）|
+| entities | cart | 购物车聚合（Cart实体 + CartItem值对象）|
 
 ## 关键约定
 - 路径别名：`@/*` → `src/*`

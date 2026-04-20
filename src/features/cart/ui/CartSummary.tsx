@@ -68,6 +68,7 @@ export function CartSummary({
 
       {/* Checkout Button */}
       <button
+        type="button"
         onClick={onCheckout}
         disabled={isLoading || itemCount === 0}
         className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-md font-medium transition-colors"

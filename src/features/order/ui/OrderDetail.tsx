@@ -68,6 +68,7 @@ export function OrderDetail({ order, onPay, onCancel, isPaying, isCancelling }: 
       <div className="flex gap-3 pt-4">
         {canPay && onPay && (
           <button
+            type="button"
             onClick={onPay}
             disabled={isPaying}
             className="flex-1 py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-md font-medium transition-colors"
@@ -78,6 +79,7 @@ export function OrderDetail({ order, onPay, onCancel, isPaying, isCancelling }: 
         )}
         {canCancel && onCancel && (
           <button
+            type="button"
             onClick={onCancel}
             disabled={isCancelling}
             className="flex-1 py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white rounded-md font-medium transition-colors"

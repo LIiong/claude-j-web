@@ -16,9 +16,7 @@ export function OrderDetailWidget({ orderId }: OrderDetailWidgetProps) {
 
   if (isLoading) {
     return (
-      <div className="p-4 text-center text-gray-500" role="status">
-        Loading order details...
-      </div>
+      <output className="p-4 text-center text-gray-500 block">Loading order details...</output>
     );
   }
 

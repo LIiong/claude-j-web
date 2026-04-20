@@ -12,25 +12,23 @@ export interface OrderListProps {
 export function OrderList({ orders, onViewDetail, isLoading }: OrderListProps) {
   if (isLoading) {
     return (
-      <div className="text-center py-8 text-gray-500" role="status" aria-label="Loading orders">
+      <output className="text-center py-8 text-gray-500 block" aria-label="Loading orders">
         Loading orders...
-      </div>
+      </output>
     );
   }
 
   if (orders.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500" role="status">
-        No orders found
-      </div>
-    );
+    return <output className="text-center py-8 text-gray-500 block">No orders found</output>;
   }
 
   return (
-    <div className="space-y-4" role="list" aria-label="Order list">
+    <ul className="space-y-4" aria-label="Order list">
       {orders.map((order) => (
-        <OrderCard key={order.orderId} order={order} onViewDetail={onViewDetail} />
+        <li key={order.orderId}>
+          <OrderCard order={order} onViewDetail={onViewDetail} />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
+import type { CartItemResponseDTO } from '@/shared/api/dto/cart';
 import { useCartStore } from '../model/store';
 import type { CartState } from '../model/store';
-import type { CartItemResponseDTO } from '@/shared/api/dto/cart';
 
 export interface CartItemProps {
   readonly item: CartItemResponseDTO;
@@ -72,6 +72,7 @@ export function CartItem({
 
       {/* Remove Button */}
       <button
+        type="button"
         onClick={() => onRemove(item.productId)}
         disabled={isRemoving}
         className="px-3 py-1 text-sm text-red-600 hover:text-red-800 disabled:text-gray-400"

@@ -19,25 +19,22 @@ export function CartList({
   removingItems,
 }: CartListProps) {
   if (items.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500" role="status">
-        Your cart is empty
-      </div>
-    );
+    return <output className="text-center py-8 text-gray-500 block">Your cart is empty</output>;
   }
 
   return (
-    <div className="divide-y divide-gray-200" role="list" aria-label="Cart items">
+    <ul className="divide-y divide-gray-200" aria-label="Cart items">
       {items.map((item) => (
-        <CartItem
-          key={item.productId}
-          item={item}
-          onUpdateQuantity={onUpdateQuantity}
-          onRemove={onRemove}
-          isUpdating={updatingItems?.has(item.productId)}
-          isRemoving={removingItems?.has(item.productId)}
-        />
+        <li key={item.productId}>
+          <CartItem
+            item={item}
+            onUpdateQuantity={onUpdateQuantity}
+            onRemove={onRemove}
+            isUpdating={updatingItems?.has(item.productId)}
+            isRemoving={removingItems?.has(item.productId)}
+          />
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

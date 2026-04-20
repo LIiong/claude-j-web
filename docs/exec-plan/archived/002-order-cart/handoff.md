@@ -1,12 +1,23 @@
 ---
 task-id: "002-order-cart"
 from: qa
-to: dev
-status: changes-requested
-timestamp: "2025-04-19T20:30:00"
+to: ship
+status: approved
+timestamp: "2025-04-19T21:20:00"
 task-type: frontend
 ui-surface: true
-ui-review-score: pending
+ui-review-score: 4.5
+backend-sync:
+  schema-sha: pending
+  sync-mode: real
+  backend-probe: reachable
+pre-flight:
+  tsc: pass # pnpm tsc --noEmit exit 0
+  vitest: pass # Tests: 129 passed, 0 failed
+  biome: pass # All checks passed
+  entropy-check: pass # 13/13 checks passed
+summary: "QA 验收通过 - 订单与购物车功能完整交付"
+---
 backend-sync:
   schema-sha: pending
   sync-mode: real

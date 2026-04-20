@@ -14,16 +14,10 @@ export function OrderCard({ order, onViewDetail }: OrderCardProps) {
   };
 
   return (
-    <div
-      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+    <button
+      type="button"
+      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow text-left w-full"
       onClick={handleClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          handleClick();
-        }
-      }}
-      role="button"
-      tabIndex={0}
       aria-label={`Order ${order.orderId}`}
     >
       <div className="flex justify-between items-start mb-2">
@@ -44,6 +38,6 @@ export function OrderCard({ order, onViewDetail }: OrderCardProps) {
         </p>
         <span className="text-blue-600 hover:text-blue-800 text-sm">View Details →</span>
       </div>
-    </div>
+    </button>
   );
 }
